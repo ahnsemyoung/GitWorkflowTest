@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerInputController : MonoBehaviour
 {
     [SerializeField]
     private GameObject PlayerCamera = null;
+
+    [SerializeField]
+    private LayerMask GroundMask = -1;
 
     [SerializeField]
     private float PlayerMoveSpeed = 1.0f;
@@ -15,7 +18,6 @@ public class PlayerInputController : MonoBehaviour
     [SerializeField]
     private float JumpForce = 5.0f;
 
-    private CapsuleCollider _playerCollider = null;
     private Rigidbody _playerRigidbody = null;
 
     private float _playerVerticalRotate = 0.0f;
@@ -24,7 +26,6 @@ public class PlayerInputController : MonoBehaviour
     #region MonoBehaviour Callbacks
     private void Start()
     {
-        _playerCollider = GetComponent<CapsuleCollider>();
         _playerRigidbody = GetComponent<Rigidbody>();
     }
 
@@ -39,18 +40,22 @@ public class PlayerInputController : MonoBehaviour
         Vector3 playerEulerAngle = PlayerCamera.transform.rotation.eulerAngles;
         _playerVerticalRotate = playerEulerAngle.x;
         _playerHorizontalRotate = playerEulerAngle.y;
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update()
     {
-        if (Input.GetButtonDown("Jump")) JumpOnPosition();
+        if (Input.GetButtonDown("Jump"))
+        {
+            JumpOnPosition();
+        }
     }
 
     private void FixedUpdate()
     {
-        Vector3 nextPosition = GetNextDirectionByKeyInput() * Time.fixedDeltaTime * PlayerMoveSpeed
-                            + _playerRigidbody.position;
-        _playerRigidbody.MovePosition(nextPosition);
+        Vector3 nextDirection = GetNextDirectionByKeyInput();
+        _playerRigidbody.position += nextDirection * Time.fixedDeltaTime * PlayerMoveSpeed;
     }
 
     private void LateUpdate()
@@ -59,7 +64,7 @@ public class PlayerInputController : MonoBehaviour
     }
     #endregion
 
-    #region Private Field
+    #region Private Method
     private Vector3 GetNextDirectionByKeyInput()
     {
         Vector3 inputVector = Vector3.zero;
@@ -76,16 +81,23 @@ public class PlayerInputController : MonoBehaviour
         _playerVerticalRotate -= Input.GetAxisRaw("Mouse Y") * Time.deltaTime * PlayerRotateSpeed;
         _playerHorizontalRotate += Input.GetAxisRaw("Mouse X") * Time.deltaTime * PlayerRotateSpeed;
 
-        Vector3 playerEulerAngle = PlayerCamera.transform.rotation.eulerAngles;
-        playerEulerAngle.x = _playerVerticalRotate;
-        playerEulerAngle.y = _playerHorizontalRotate;
+        Vector3 playerEulerAngle = new Vector3(_playerVerticalRotate, _playerHorizontalRotate, 0);
 
         PlayerCamera.transform.rotation = Quaternion.Euler(playerEulerAngle);
     }
 
     private void JumpOnPosition()
     {
-        _playerRigidbody.AddForce(transform.up * _playerRigidbody.mass * JumpForce, ForceMode.Impulse);
+        if (CheckOnGround())
+            _playerRigidbody.AddForce(transform.up * _playerRigidbody.mass * JumpForce, ForceMode.Impulse);
+    }
+
+    private bool CheckOnGround()
+    {
+        Debug.DrawRay(transform.position, -transform.up * 0.1f, Color.red, 1.0f);
+        Collider[] ground = Physics.OverlapSphere(transform.position, 0.1f, GroundMask);
+
+        return ground.Length != 0;
     }
     #endregion
 }
