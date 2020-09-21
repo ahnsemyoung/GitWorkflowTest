@@ -55,7 +55,12 @@ public class PlayerInputController : MonoBehaviour
     private void FixedUpdate()
     {
         Vector3 nextDirection = GetNextDirectionByKeyInput();
-        _playerRigidbody.position += nextDirection * Time.fixedDeltaTime * PlayerMoveSpeed;
+        Vector3 playerVelocity = _playerRigidbody.velocity;
+
+        playerVelocity.x = nextDirection.x * PlayerMoveSpeed;
+        playerVelocity.z = nextDirection.z * PlayerMoveSpeed;
+
+        _playerRigidbody.velocity = playerVelocity;
     }
 
     private void LateUpdate()
