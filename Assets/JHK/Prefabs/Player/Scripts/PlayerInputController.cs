@@ -89,6 +89,9 @@ public class PlayerInputController : MonoBehaviour
         Vector3 playerEulerAngle = new Vector3(_playerVerticalRotate, _playerHorizontalRotate, 0);
 
         PlayerCamera.transform.rotation = Quaternion.Euler(playerEulerAngle);
+
+        Vector3 playerRotate = new Vector3(0, playerEulerAngle.y, 0);
+        transform.rotation = Quaternion.Euler(playerRotate);
     }
 
     private void JumpOnPosition()

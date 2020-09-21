@@ -29,18 +29,22 @@ public class EnemyController : MonoBehaviour
 
     private void FindTarget()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, 3.0f, PlayerLayerMask);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 5.0f, PlayerLayerMask);
         _isTargetFind = (colliders.Length != 0);
         if (_isTargetFind)
         {
             _target = colliders[0].transform.gameObject;
+            _enemyNavmeshAgent.isStopped = false;
         }
     }
 
     private void FollowTarget()
     {
         _enemyNavmeshAgent.destination = _target.transform.position;
-        if (Vector3.Distance(transform.position, _target.transform.position) < 5.0f)
+        if (Vector3.Distance(transform.position, _target.transform.position) > 5.0f)
+        {
             _isTargetFind = false;
+            _enemyNavmeshAgent.isStopped = true;
+        }
     }
 }

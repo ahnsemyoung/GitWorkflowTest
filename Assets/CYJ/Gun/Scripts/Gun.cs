@@ -18,10 +18,9 @@ public class Gun : MonoBehaviour
     private void Update()
     {
         if(Input.GetButtonDown("Fire1"))
-        Shoot();
-
-        this.transform.eulerAngles = Screen.transform.eulerAngles;
+            Shoot();
     }
+
     public void Shoot()
     {
         if (_bulletCount <= 0)
