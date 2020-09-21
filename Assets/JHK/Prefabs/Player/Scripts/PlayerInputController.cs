@@ -4,6 +4,9 @@
 public class PlayerInputController : MonoBehaviour
 {
     [SerializeField]
+    private float OtherValue = 1.0f;
+
+    [SerializeField]
     private GameObject PlayerCamera = null;
 
     [SerializeField]
